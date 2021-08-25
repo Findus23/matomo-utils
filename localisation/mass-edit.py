@@ -47,9 +47,15 @@ community_components = {slug: comp for slug, comp in components.items() if "Comm
 
 official_components = {slug: components[slug] for slug in set(phpcomponents) - set(community_components)}
 
+core_repo_components = {slug: comp for slug, comp in components.items() if
+                        "https://github.com/matomo-org/matomo/" == comp["repo"]}
+
 for slug, comp in phpcomponents.items():
     print(slug, comp["name"])
     print(comp["check_flags"])
+    license = comp["license"]
+    if license != "GPL-3.0-or-later":
+        print(license)
     update_setting(comp, {
         "check_flags": "php-format,ignore-optional-plural"
     })
