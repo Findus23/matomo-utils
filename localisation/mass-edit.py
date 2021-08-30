@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List, Tuple
 
 import requests
 
@@ -38,6 +38,17 @@ def create_addon(component, name, configuration: Dict):
         r.raise_for_status()
 
 
+def get_addons(addons: List[str]) -> Tuple[Dict[str, int], Dict[str, Dict]]:
+    ids = {}
+    configs = {}
+    for addon in addons:
+        r = s.get(addon)
+        data = r.json()
+        ids[data["name"]] = data["id"]
+        configs[data["name"]] = data["configuration"]
+    return ids, configs
+
+
 components = {}
 
 r = s.get(url + f"projects/{PROJECT}/components/")
@@ -65,32 +76,38 @@ core_repo_components = {slug: comp for slug, comp in components.items() if
                         "https://github.com/matomo-org/matomo/" == comp["repo"]}
 
 non_core_repo_components = diff_dicts(phpcomponents, core_repo_components)
+non_core_repo_components = diff_dicts(non_core_repo_components, community_components)
 
-
-for slug, comp in community_components.items():
+for slug, comp in phpcomponents.items():
     print(slug, comp["name"])
-    # print(comp["check_flags"])
-    # license = comp["license"]
-    # if license != "GPL-3.0-or-later":
-    #     print(license)
-    update_setting(comp, {
-        "check_flags": "php-format,safe-html,ignore-optional-plural",
-        # "license": "proprietary",
-        "manage_units": False,  # Manage strings
-        "enforced_checks": [
-            "php_format"
-        ],
-    })
-    if comp["addons"]:
-        print("skipping")
-        continue
-    create_addon(comp, name="weblate.cleanup.blank", configuration={})
-    create_addon(comp, name="weblate.cleanup.generic", configuration={})
-    create_addon(comp, name="weblate.json.customize", configuration={
-        "sort_keys": True,
-        "indent": 4,
-        "style": "spaces"
-    })
+    addon_ids, addon_configs = get_addons(comp["addons"])
+    license = comp["license"]
+    if license != "GPL-3.0-or-later":
+        print(license)
+    # update_setting(comp, {
+    #     "check_flags": "php-format,safe-html,ignore-optional-plural",
+    #     # "license": "proprietary",
+    #     "manage_units": False,  # Manage strings
+    #     "edit_template": True,
+    #     "enforced_checks": [
+    #         "php_format"
+    #     ],
+    # })
+    # create_addon(comp, name="weblate.cleanup.blank", configuration={})
+    # create_addon(comp, name="weblate.cleanup.generic", configuration={})
+    # create_addon(comp, name="weblate.json.customize", configuration={
+    #     "sort_keys": True,
+    #     "indent": 4,
+    #     "style": "spaces"
+    # })
+    if "weblate.git.squash" not in addon_ids.keys():
+        print("add addon")
+        create_addon(comp, name="weblate.git.squash", configuration={
+            "squash": "language",
+            "append_trailers": True,
+            "commit_message": ""
+        })
+    # input("done\n")
     # lock_component(comp, unlock=True)
     # print("locked")
     # exit()
