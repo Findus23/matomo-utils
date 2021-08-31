@@ -1,6 +1,6 @@
 from pathlib import Path
 
-lang_dir = Path("../lang")
+lang_dir = Path("../../lang")
 
 languages_in_matomo = set(str(dir.stem) for dir in lang_dir.glob("*.json"))
 

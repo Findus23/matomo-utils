@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 import requests
 
 from config import *
+from priorities import priorities, Priority
 
 s = requests.Session()
 s.headers.update({"Authorization": "Token " + token})
@@ -84,22 +85,33 @@ for slug, comp in phpcomponents.items():
     license = comp["license"]
     if license != "GPL-3.0-or-later":
         print(license)
-    # update_setting(comp, {
-    #     "check_flags": "php-format,safe-html,ignore-optional-plural",
-    #     # "license": "proprietary",
-    #     "manage_units": False,  # Manage strings
-    #     "edit_template": True,
-    #     "enforced_checks": [
-    #         "php_format"
-    #     ],
-    # })
-    # create_addon(comp, name="weblate.cleanup.blank", configuration={})
-    # create_addon(comp, name="weblate.cleanup.generic", configuration={})
-    # create_addon(comp, name="weblate.json.customize", configuration={
-    #     "sort_keys": True,
-    #     "indent": 4,
-    #     "style": "spaces"
-    # })
+    if slug in priorities:
+        priority = priorities[slug]
+    else:
+        priority = Priority.medium
+    update_setting(comp, {
+        "check_flags": "php-format,safe-html,ignore-optional-plural",
+        # "license": "proprietary",
+        "manage_units": False,  # Manage strings
+        "edit_template": True,
+        "enforced_checks": [
+            "php_format"
+        ],
+        "priority": priority.value,
+        "language_code_style": "bcp",
+        "new_lang": "contact",
+        "push_on_commit": True,
+    })
+    if "weblate.cleanup.blank" not in addon_ids.keys():
+        create_addon(comp, name="weblate.cleanup.blank", configuration={})
+    if "weblate.cleanup.generic" not in addon_ids.keys():
+        create_addon(comp, name="weblate.cleanup.generic", configuration={})
+    if "weblate.json.customize" not in addon_ids.keys():
+        create_addon(comp, name="weblate.json.customize", configuration={
+            "sort_keys": True,
+            "indent": 4,
+            "style": "spaces"
+        })
     if "weblate.git.squash" not in addon_ids.keys():
         print("add addon")
         create_addon(comp, name="weblate.git.squash", configuration={
