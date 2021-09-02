@@ -56,6 +56,6 @@ priorities = {
     "plugin-websitemeasurable": Priority.high,
     "plugin-widgetize": Priority.high,
     "plugin-securityinfo": Priority.low,
-    "ommunityplugin-diagnosticsextended": Priority.low,
+    "communityplugin-diagnosticsextended": Priority.low,
 
 }

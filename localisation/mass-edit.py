@@ -93,7 +93,7 @@ for slug, comp in phpcomponents.items():
         "check_flags": "php-format,safe-html,ignore-optional-plural",
         # "license": "proprietary",
         "manage_units": False,  # Manage strings
-        "edit_template": True,
+        "edit_template": False,
         "enforced_checks": [
             "php_format"
         ],
@@ -101,18 +101,24 @@ for slug, comp in phpcomponents.items():
         "language_code_style": "bcp",
         "new_lang": "contact",
         "push_on_commit": True,
+        "commit_message": "Translated using Weblate ({{ language_name }})\n\nCurrently translated at {{ stats.translated_percent }}% ({{ stats.translated }} of {{ stats.all }} strings)\n\nTranslation: {{ project_name }}/{{ component_name }}\nTranslate-URL: {{ url }}\n\n[ci skip]",
+        "add_message": "Added translation using Weblate ({{ language_name }})\n\n[ci skip]",
+        "delete_message": "Deleted translation using Weblate ({{ language_name }})\n\n[ci skip]",
+        "merge_message": "Merge branch '{{ component_remote_branch }}' into Weblate.\n\n[ci skip]",
+        "addon_message": "Update translation files\n\nUpdated by \"{{ addon_name }}\" hook in Weblate.\n\nTranslation: {{ project_name }}/{{ component_name }}\nTranslate-URL: {{ url }}\n\n[ci skip]",
     })
-    if "weblate.cleanup.blank" not in addon_ids.keys():
+    is_wordpress = "Wordpress" in comp["name"]
+    if "weblate.cleanup.blank" not in addon_ids.keys() and not is_wordpress:
         create_addon(comp, name="weblate.cleanup.blank", configuration={})
-    if "weblate.cleanup.generic" not in addon_ids.keys():
+    if "weblate.cleanup.generic" not in addon_ids.keys() and not is_wordpress:
         create_addon(comp, name="weblate.cleanup.generic", configuration={})
-    if "weblate.json.customize" not in addon_ids.keys():
+    if "weblate.json.customize" not in addon_ids.keys() and not is_wordpress:
         create_addon(comp, name="weblate.json.customize", configuration={
             "sort_keys": True,
             "indent": 4,
             "style": "spaces"
         })
-    if "weblate.git.squash" not in addon_ids.keys():
+    if "weblate.git.squash" not in addon_ids.keys() and PROJECT == "matomo":
         print("add addon")
         create_addon(comp, name="weblate.git.squash", configuration={
             "squash": "language",
