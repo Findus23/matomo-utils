@@ -21,7 +21,9 @@ actions = {
 def print_count(project, year, month, csv=False):
     for action, action_name in actions.items():
         params = {
-            "action": action
+            "action": action,
+            "timestamp_after": f"{year}-{month}-01T00:00:00+00:00",
+            "timestamp_before": f"{year}-{month + 1}-01T00:00:00+00:00"
         }
 
         r = s.get(url + f"projects/{project}/changes/", params=params)

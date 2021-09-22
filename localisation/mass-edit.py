@@ -66,6 +66,7 @@ while data["next"]:
         components[comp["slug"]] = comp
 
 assert len(components) == count
+print(f"{count} components")
 
 phpcomponents = {slug: comp for slug, comp in components.items() if not comp["is_glossary"]}
 
@@ -79,7 +80,7 @@ core_repo_components = {slug: comp for slug, comp in components.items() if
 non_core_repo_components = diff_dicts(phpcomponents, core_repo_components)
 non_core_repo_components = diff_dicts(non_core_repo_components, community_components)
 
-for slug, comp in phpcomponents.items():
+for slug, comp in community_components.items():
     print(slug, comp["name"])
     addon_ids, addon_configs = get_addons(comp["addons"])
     license = comp["license"]
